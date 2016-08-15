@@ -1,4 +1,4 @@
 public enum AreaType
 {
-    LAWNMOWER, SPIRAL
+	LAWNMOWER, SPIRAL
 }
