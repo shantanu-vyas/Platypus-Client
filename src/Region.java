@@ -12,15 +12,23 @@ public class Region extends Path
   private static final double LAT_D_PER_M = 1.0 / 110000.0;
 
 
-  //Points will be the original points
+	//Dont quickhull points, keep them original
+	private ArrayList<LatLng> editedPoints = new ArrayList<LatLng>();
+  //Points will be the original points																																	 
   private ArrayList<LatLng> regionPoints = new ArrayList<LatLng>();
+	
   public Region()
   {
-
+		
+  }
+	public Region(ArrayList<LatLng> list)
+  {
+		setPoints(list);
   }
 
   public void setAreaType(AreaType type)
   {
+		//quickHull();
     regionType = type;
     updateRegionPoints();
   }
@@ -73,10 +81,11 @@ public class Region extends Path
     points.add(point);
     updateRegionPoints();
   }
-  public void removePoint(int index)
+  public boolean removePoint(int index)
   {
-    points.remove(index);
-    updateRegionPoints();
+		points.remove(index);
+		updateRegionPoints();
+		return true;
   }
   public void clearPoints()
   {
@@ -137,7 +146,7 @@ public class Region extends Path
     }
     hullSet(A, B, rightSet, convexHull);
     hullSet(B, A, leftSet, convexHull);
-    regionPoints = new ArrayList<LatLng>(convexHull);
+    points = new ArrayList<LatLng>(convexHull);
   }
   public void hullSet(LatLng A, LatLng B, ArrayList<LatLng> set,
                       ArrayList<LatLng> hull) {
@@ -291,6 +300,7 @@ public class Region extends Path
 
   public ArrayList <ArrayList<LatLng>> computeSpiralsPolygonOffset() {
     ArrayList<ArrayList<LatLng>> spirals = new ArrayList<ArrayList<LatLng>>();
+		quickHull();
     spirals.add(points); //add first polygon
     if (points.size() <= 2) {
       System.out.println("poly size <= 2 is: " + points.size());
@@ -458,7 +468,7 @@ public class Region extends Path
         path.add(new LatLng(curLat, rightLon));
         totalLength += Math.abs((rightLon - leftLon) * LON_D_PER_M);
       } else {
-        System.out.println("null");
+        //System.out.println("null");
       }
       // Right to left
       curLat = curLat+stepSize;
@@ -471,7 +481,7 @@ public class Region extends Path
           path.add(new LatLng(curLat, leftLon));
           totalLength += Math.abs((rightLon - leftLon) * LON_D_PER_M);
         } else {
-          System.out.println("null");
+          //System.out.println("null");
         }
       }
       curLat = curLat + stepSize;
@@ -597,24 +607,27 @@ public class Region extends Path
   {
     super.outputPointsToOctave();
   }
-  public void outputPointsToOctave()
+
+
+  public void outputPointsToOctave(String prefix,String plot)
   {
     String output = "";
-    System.out.print("x=[");
+    System.out.print(prefix+"x=[");
     for (LatLng a : regionPoints)
     {
       System.out.print(a.getLatitude() + ",");
     }
     System.out.print("]");
     System.out.println("\n");
-    System.out.print("y=[");
+    System.out.print(prefix+"y=[");
     for (LatLng a : regionPoints)
     {
       System.out.print(a.getLongitude() + ",");
     }
     System.out.print("]");
     System.out.println("");
-    System.out.println("plot(x,y)");
+    System.out.println("plot("+prefix+"x,"+prefix+"y," + plot+")");
+		System.out.println("hold on;");
   }
 
 }
