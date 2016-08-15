@@ -29,6 +29,12 @@ public class Region extends Path
     {
         return regionType;
     }
+
+	/*
+	  Any time you call setPoints or add/removePoint/clear the new
+	  regionPoints is generated.
+	 */
+
     public ArrayList<LatLng> getRegionPoints()
     {
         return regionPoints;
@@ -37,39 +43,41 @@ public class Region extends Path
     {
         return points;
     }
+	public void updateRegionPoints()
+	{
+		regionPoints.clear();
+        if (regionType == AreaType.SPIRAL)
+        {
+			quickHull();
+			ArrayList<ArrayList<LatLng>> spiralPath = computeSpiralsPolygonOffset();
+			for (ArrayList<LatLng> a : spiralPath)
+            {
+                for (LatLng p : a)
+                {
+                    regionPoints.add(p);
+                }
+            }
+        }
+        if (regionType == AreaType.LAWNMOWER)
+        {
+            getLawnmowerPath(transectDistance/2);
+        }
+		
+	}
     public void setPoints(ArrayList<LatLng> list)
     {
         points = list;
-        if (regionType == AreaType.SPIRAL)
-        {
-
-        }
-        if (regionType == AreaType.LAWNMOWER)
-        {
-
-        }
+		updateRegionPoints();
     }
     public void addPoint(LatLng point)
-    {
-        if (regionType == AreaType.SPIRAL)
-        {
-
-        }
-        if (regionType == AreaType.LAWNMOWER)
-        {
-
-        }
+	{
+		points.add(point);
+		updateRegionPoints();
     }
     public void removePoint(int index)
     {
-        if (regionType == AreaType.SPIRAL)
-        {
-
-        }
-        if (regionType == AreaType.LAWNMOWER)
-        {
-
-        }
+		points.remove(index);
+		updateRegionPoints();
     }
     public void clearPoints()
     {
@@ -281,11 +289,12 @@ public class Region extends Path
 
     /*This works by finding the bisecting vector of each angle and
      * moving along the secting vector of distance dist/sin(angle/2) */
-    public ArrayList<ArrayList<LatLng>> computeSpiralsPolygonOffset(ArrayList<LatLng> polygon) {
+
+    public ArrayList <ArrayList<LatLng>> computeSpiralsPolygonOffset() {
         ArrayList<ArrayList<LatLng>> spirals = new ArrayList<ArrayList<LatLng>>();
-        spirals.add(polygon); //add first polygon
-        if (polygon.size() <= 2) {
-            System.out.println("poly size <= 2 is: " + polygon.size());
+        spirals.add(points); //add first polygon
+        if (points.size() <= 2) {
+            System.out.println("poly size <= 2 is: " + points.size());
             return spirals;
         }
 
@@ -409,16 +418,20 @@ public class Region extends Path
     // }
 
 
-    public static Object[] getLawnmowerPath(ArrayList<LatLng> area, double stepSize) {
+    public void  getLawnmowerPath(double stepSize) {
 
         // Compute the bounding box
+		/*Since we have to add the original point to the end we dont
+		 * want to edit the points arraylist */
+		
+		ArrayList<LatLng> area = new ArrayList<LatLng>(points); 
         area.add(area.get(0)); //adds first point to end so the final vector can be computed...
         double minLat = 360;
         double maxLat = -360;
         double minLon = 360;
         double maxLon = -360;
         Double curLat = null;
-        System.out.println(area);
+
         for (LatLng latLon : area) {  //get list of points
             if (latLon.getLatitude() > maxLat) { //if latlong.getLatitude()...
                 maxLat = latLon.getLatitude();
@@ -467,8 +480,8 @@ public class Region extends Path
                 totalLength += stepSize;
             }
         }
-
-        return new Object[]{path, totalLength};
+        //return new Object[]{path, totalLength};
+		regionPoints = path;
     }
     public static Double getMinLonAt(ArrayList<LatLng> area, double minLon, double maxLon, double lat) {
         final double lonDiff = 1.0 / 90000.0 * 10.0;
@@ -560,30 +573,6 @@ public class Region extends Path
             reordered.add(list.get(i));
         }
         return reordered;
-    }
-    public ArrayList<LatLng> getPoints(ArrayList<LatLng> area, AreaType type)
-    {
-
-        ArrayList<LatLng> flatList = new ArrayList<LatLng>();
-        if (type == AreaType.LAWNMOWER)
-        {
-
-            Object[] output = getLawnmowerPath(area,transectDistance/2);
-            flatList = (ArrayList<LatLng>)output[0];
-        }
-        if (type == AreaType.SPIRAL)
-        {
-            quickHull();
-            ArrayList<ArrayList<LatLng>> spirals = computeSpiralsPolygonOffset(points);
-            for (ArrayList<LatLng> a : spirals)
-            {
-                for (LatLng p : a)
-                {
-                    flatList.add(p);
-                }
-            }
-        }
-        return flatList;
     }
 
 	    public static boolean linesIntersect(final double X1, final double Y1, final double X2, final double Y2, final double X3, final double Y3, final double X4, final double Y4) {
