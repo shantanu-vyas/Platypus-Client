@@ -1,18 +1,17 @@
 import java.util.ArrayList;
 
+
 public class Region extends Path
 {
-    public enum AreaType
-    {
-        LAWNMOWER, SPIRAL
-    }
 
-    private double transectDistance = .00000898; //10 meters, initial value
+//    private double transectDistance = .00000898; //10 meters,
+//    initial value
+    private double transectDistance = .1; //10 meters, initial value
     private final double oneMeter = transectDistance/10;
     private AreaType regionType = AreaType.SPIRAL;
-	private static final double LON_D_PER_M = 1.0 / 90000.0;
+    private static final double LON_D_PER_M = 1.0 / 90000.0;
     private static final double LAT_D_PER_M = 1.0 / 110000.0;
-	
+
 
     //Points will be the original points
     private ArrayList<LatLng> regionPoints = new ArrayList<LatLng>();
@@ -24,16 +23,17 @@ public class Region extends Path
     public void setAreaType(AreaType type)
     {
         regionType = type;
+        updateRegionPoints();
     }
     public AreaType getAreaType()
     {
         return regionType;
     }
 
-	/*
-	  Any time you call setPoints or add/removePoint/clear the new
-	  regionPoints is generated.
-	 */
+    /*
+      Any time you call setPoints or add/removePoint/clear the new
+      regionPoints is generated.
+    */
 
     public ArrayList<LatLng> getRegionPoints()
     {
@@ -43,14 +43,14 @@ public class Region extends Path
     {
         return points;
     }
-	public void updateRegionPoints()
-	{
-		regionPoints.clear();
+    public void updateRegionPoints()
+    {
+        regionPoints.clear();
         if (regionType == AreaType.SPIRAL)
         {
-			quickHull();
-			ArrayList<ArrayList<LatLng>> spiralPath = computeSpiralsPolygonOffset();
-			for (ArrayList<LatLng> a : spiralPath)
+            //quickHull();
+            ArrayList<ArrayList<LatLng>> spiralPath = computeSpiralsPolygonOffset();
+            for (ArrayList<LatLng> a : spiralPath)
             {
                 for (LatLng p : a)
                 {
@@ -62,22 +62,22 @@ public class Region extends Path
         {
             getLawnmowerPath(transectDistance/2);
         }
-		
-	}
+
+    }
     public void setPoints(ArrayList<LatLng> list)
     {
         points = list;
-		updateRegionPoints();
+        updateRegionPoints();
     }
     public void addPoint(LatLng point)
-	{
-		points.add(point);
-		updateRegionPoints();
+    {
+        points.add(point);
+        updateRegionPoints();
     }
     public void removePoint(int index)
     {
-		points.remove(index);
-		updateRegionPoints();
+        points.remove(index);
+        updateRegionPoints();
     }
     public void clearPoints()
     {
@@ -421,10 +421,10 @@ public class Region extends Path
     public void  getLawnmowerPath(double stepSize) {
 
         // Compute the bounding box
-		/*Since we have to add the original point to the end we dont
-		 * want to edit the points arraylist */
-		
-		ArrayList<LatLng> area = new ArrayList<LatLng>(points); 
+        /*Since we have to add the original point to the end we dont
+         * want to edit the points arraylist */
+
+        ArrayList<LatLng> area = new ArrayList<LatLng>(points);
         area.add(area.get(0)); //adds first point to end so the final vector can be computed...
         double minLat = 360;
         double maxLat = -360;
@@ -481,7 +481,7 @@ public class Region extends Path
             }
         }
         //return new Object[]{path, totalLength};
-		regionPoints = path;
+        regionPoints = path;
     }
     public static Double getMinLonAt(ArrayList<LatLng> area, double minLon, double maxLon, double lat) {
         final double lonDiff = 1.0 / 90000.0 * 10.0;
@@ -517,10 +517,10 @@ public class Region extends Path
             LatLng p2 = positions.get(i);
 
             if (((p2.getLatitude() <= point.getLatitude()
-                    && point.getLatitude() < p1.getLatitude())
-                    || (p1.getLatitude() <= point.getLatitude()
-                    && point.getLatitude() < p2.getLatitude()))
-                    && (point.getLongitude() < (p1.getLongitude() - p2.getLongitude())
+                  && point.getLatitude() < p1.getLatitude())
+                 || (p1.getLatitude() <= point.getLatitude()
+                     && point.getLatitude() < p2.getLatitude()))
+                && (point.getLongitude() < (p1.getLongitude() - p2.getLongitude())
                     * (point.getLatitude() - p2.getLatitude())
                     / (p1.getLatitude() - p2.getLatitude()) + p2.getLongitude())) {
                 result = !result;
@@ -575,11 +575,11 @@ public class Region extends Path
         return reordered;
     }
 
-	    public static boolean linesIntersect(final double X1, final double Y1, final double X2, final double Y2, final double X3, final double Y3, final double X4, final double Y4) {
+    public static boolean linesIntersect(final double X1, final double Y1, final double X2, final double Y2, final double X3, final double Y3, final double X4, final double Y4) {
         return ((relativeCCW(X1, Y1, X2, Y2, X3, Y3)
-                * relativeCCW(X1, Y1, X2, Y2, X4, Y4) <= 0) && (relativeCCW(X3,
-                Y3, X4, Y4, X1, Y1)
-                * relativeCCW(X3, Y3, X4, Y4, X2, Y2) <= 0));
+                 * relativeCCW(X1, Y1, X2, Y2, X4, Y4) <= 0) && (relativeCCW(X3,
+                                                                             Y3, X4, Y4, X1, Y1)
+                                                                 * relativeCCW(X3, Y3, X4, Y4, X2, Y2) <= 0));
     }
 
     public double findInteriorAngle(LatLng a, LatLng b) {
@@ -596,7 +596,7 @@ public class Region extends Path
     }
     public void outputRegionToOctave()
     {
-		String output = "";
+        String output = "";
         System.out.print("x=[");
         for (LatLng a : regionPoints)
         {
