@@ -1,0 +1,40 @@
+* Ideas
+** Seperate logic from UI entirely 
+** Fragment code 
+* Organization
+** Main Activity
+*** Fragments
+*** Joystick (only thing needed for teleop)
+*** UDPVehicleServer
+*** MapboxMap
+*** List of touched points
+*** List of waypoints to be sent
+*** List of markers to be drawn
+*** Polyline (Waypath)
+
+** Fragments
+*** Waypoint Path 
+*** Region Path
+*** Sensor Data
+** Path
+*** Attributes
+**** List of points
+**** Transect angle (implement this later on..)
+*** Methods
+**** Add Point 
+**** Delete Point 
+**** Get Point
+**** Get List
+**** Get Size
+**** etc...
+** Region (extends path)
+*** Attributes 
+**** (existing)
+**** Type Enum
+*** Methods
+**** Existing
+**** override get point, get list, get size etc..
+**** Get type
+
+
+
